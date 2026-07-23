@@ -1,55 +1,83 @@
 const express = require("express");
 const path = require("path");
-const dotenv = require('dotenv').config();
-const cookieParser = require('cookie-parser');
-const userModel = require('./models/user_model');
-const jwt = require('jsonwebtoken');
-const { generateToken } = require('../utils/generateToken');
-const { isLoggedin } = require('../middlewares/isLoggedin');
+require("dotenv").config();
+
+const cookieParser = require("cookie-parser");
+
+const userModel = require("./models/user_model");
+const { generateToken } = require("../utils/generateToken");
+const { isLoggedin } = require("../middlewares/isLoggedin");
 
 const app = express();
 
+// Middleware
 app.use(express.json());
-app.use(express.static(path.join(__dirname, "../public")));
-app.set('view engine', 'ejs');
-app.use(express.urlencoded({extended:true}));
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
-app.get('/',isLoggedin,function(req,res){
-  res.render('index')
-})
-app.get('/signup',function(req,res){
-    console.log("Cookies:", req.cookies);
-  res.render('signup')
-})
+// Static Files
+app.use(express.static(path.join(__dirname, "../public")));
 
-app.post('/signup',async function(req,res){
-    try{
-        const {name,email,password} = req.body;
+// View Engine
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "../views"));
 
-        const existingUser = await userModel.findOne({email});
+
+// =================== Routes ===================
+
+// Home
+app.get("/", isLoggedin, (req, res) => {
+    res.render("index", { user: req.user });
+});
+
+// Signup Page
+app.get("/signup", (req, res) => {
+    res.render("signup");
+});
+
+// Signup
+app.post("/signup", async (req, res) => {
+    try {
+        const { name, email, password } = req.body;
+
+        const existingUser = await userModel.findOne({ email });
+
         if (existingUser) {
-            res.send('User Already Exists!');
+            return res.send("User Already Exists!");
         }
 
-        const user = await userModel.create({name,email,password});
+        const user = await userModel.create({
+            name,
+            email,
+            password,
+        });
+
         const token = generateToken(user);
 
-        res.cookie("token", token);
-        res.redirect('/');
+        res.cookie("token", token, {
+            httpOnly: true,
+            sameSite: "lax",
+            secure: process.env.NODE_ENV === "production",
+        });
 
-
+        return res.redirect("/");
+    } catch (err) {
+        console.error(err);
+        return res.status(500).send(err.message);
     }
-     catch (err) {
-        res.status(400).send(err.message);
-    }
-})
+});
 
+// Logout
+app.get("/logout", (req, res) => {
+    res.clearCookie("token");
+    res.redirect("/signup");
+});
+
+// Test API
 app.get("/api/hello", (req, res) => {
     res.json({
-        message: "Hello from Express on Vercel!"
+        message: "Hello from Express on Vercel!",
     });
 });
 
-// Export instead of app.listen()
 module.exports = app;
