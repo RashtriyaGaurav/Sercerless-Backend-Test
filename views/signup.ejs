@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Battle League</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="">
+
+    <div class="flex justify-center items-center w-full h-screen">
+        <div class="w-full max-w-md p-6 ">
+            <h1 class="text-4xl font-semibold">Elite Partners</h1>
+            <h2 class="text-xl tracking-tighter mb-4 text-zinc-500">Register and continue your journey</h2>
+
+            <form action="/signup" method="POST" class="space-y-4">
+
+                <input type="text" name="name" required placeholder="Full Name"
+                    class="w-full p-2 mt-1 bg-zinc-200 text-black rounded-md ">
+                <input type="email" name="email" required placeholder="Email"
+                    class="w-full p-2 mt-1 bg-zinc-200 text-black rounded-md ">
+                <input type="password" name="password" required placeholder="Password"
+                    class="w-full p-2 mt-1 bg-zinc-200 text-black rounded-md ">
+                <input class="w-full bg-blue-500 text-black py-2 rounded-md" type="submit" value="Register">
+                <div class="text-zinc-500">Already have an account? <a href="/login" class="text-blue-500">Login</a>
+                </div>
+
+            </form>
+        </div>
+    </div>
+    
+</body>
+
+</html>
