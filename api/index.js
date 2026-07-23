@@ -1,18 +1,20 @@
 const express = require("express");
+const path = require("path");
+
 const app = express();
 
-// Define your server endpoints
-app.get("/", (req, res) => {
-  res.send("Express website is running successfully on Vercel!");
+app.use(express.json());
+app.use(express.static(path.join(__dirname, "../public")));
+
+app.get('/',function(req,res){
+  res.send('Hello World')
+})
+
+app.get("/api/hello", (req, res) => {
+    res.json({
+        message: "Hello from Express on Vercel!"
+    });
 });
 
-app.get("/about", (req, res) => {
-  res.json({ message: "This is the backend data from Express." });
-});
-
-// Required for local machine testing
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server ready on port ${PORT}.`));
-
-// CRITICAL: Export the app instance for Vercel's serverless environment
+// Export instead of app.listen()
 module.exports = app;
